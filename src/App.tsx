@@ -4,6 +4,7 @@ import { generateMarkdown, renderMd } from './utils/markdown'
 import { generateReadme } from './utils/api'
 import { AI_PROVIDERS, type AIProviderId } from './types'
 import { Step1, Step2, Step3, Step4 } from './components/FormSteps'
+import { AIProviderSelector } from './components/AIProviderSelector'
 
 const STEPS = [
   { id: 1, label: "Informações básicas" },
@@ -17,6 +18,10 @@ export default function App() {
   const [step, setStep] = useState(1)
   const [featureInput, setFeatureInput] = useState("")
   const [aiMarkdown, setAiMarkdown] = useState<string | null>(null)
+  const [aiPreview, setAiPreview] = useState<string | null>(null)
+  const [editedMarkdown, setEditedMarkdown] = useState<string | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [draft, setDraft] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -30,9 +35,15 @@ export default function App() {
     run: "npm run dev", screenshot: "",
   })
 
+  const resetAiState = () => {
+    setAiMarkdown(null)
+    setAiPreview(null)
+    setEditedMarkdown(null)
+  }
+
   const update = (key: keyof FormData, val: any) => {
     setData(d => ({ ...d, [key]: val }))
-    setAiMarkdown(null)
+    resetAiState()
   }
 
   const toggleTech = (t: string) => {
@@ -40,23 +51,23 @@ export default function App() {
       ...d,
       techs: d.techs.includes(t) ? d.techs.filter(x => x !== t) : [...d.techs, t]
     }))
-    setAiMarkdown(null)
+    resetAiState()
   }
 
   const addFeature = () => {
     if (!featureInput.trim()) return
     setData(d => ({ ...d, features: [...d.features, featureInput.trim()] }))
     setFeatureInput("")
-    setAiMarkdown(null)
+    resetAiState()
   }
 
   const removeFeature = (i: number) => {
     setData(d => ({ ...d, features: d.features.filter((_, idx) => idx !== i) }))
-    setAiMarkdown(null)
+    resetAiState()
   }
 
   const baseMarkdown = generateMarkdown(data)
-  const displayMarkdown = aiMarkdown || baseMarkdown
+  const displayMarkdown = editedMarkdown ?? aiMarkdown ?? baseMarkdown
 
   const IMPROVE_INSTRUCTION = 'Você é um technical writer especializado em READMEs de projetos GitHub para desenvolvedores brasileiros. Melhore o README fornecido: reescreva a descrição para ser mais impactante e profissional, deixe as funcionalidades mais descritivas e com verbos de ação, melhore o texto geral mantendo o tom técnico. Mantenha TODA a estrutura existente (mesmas seções, mesmos emojis, mesmos blocos de código). Retorne APENAS o markdown melhorado, sem explicações e sem blocos de código extras envolvendo o conteúdo.'
 
@@ -66,12 +77,36 @@ export default function App() {
     try {
       const prompt = `${IMPROVE_INSTRUCTION}\n\nMelhore este README:\n\n${baseMarkdown}`
       const improved = await generateReadme(prompt, provider)
-      setAiMarkdown(improved)
+      setAiPreview(improved)
     } catch (e: any) {
       setError(e.message || "Erro ao conectar com a IA. Tente novamente.")
     } finally {
       setLoading(false)
     }
+  }
+
+  const acceptAI = () => {
+    setAiMarkdown(aiPreview)
+    setEditedMarkdown(null)
+    setAiPreview(null)
+  }
+
+  const discardAI = () => {
+    setAiPreview(null)
+  }
+
+  const startEdit = () => {
+    setDraft(displayMarkdown)
+    setIsEditing(true)
+  }
+
+  const saveEdit = () => {
+    setEditedMarkdown(draft)
+    setIsEditing(false)
+  }
+
+  const cancelEdit = () => {
+    setIsEditing(false)
   }
 
   const copyToClipboard = () => {
@@ -85,7 +120,7 @@ export default function App() {
       {/* Topbar / Header */}
       <div style={{ background: 'var(--surface-1)', borderBottom: '1px solid var(--border)', padding: '14px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         
-        {/* Nova Logo Estruturada ao lado do Título */}
+        {/* Logo estruturada ao lado do título */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <svg 
             width="26" 
@@ -135,7 +170,6 @@ export default function App() {
                   width: '24px',
                   height: '24px',
                   borderRadius: '50%',
-                  /* Atualizado de verde para Azul Premium (#1f6feb) ao concluir */
                   background: isDone ? '#1f6feb' : isActive ? 'var(--text-accent)' : 'var(--border)',
                   display: 'flex',
                   alignItems: 'center',
@@ -173,36 +207,77 @@ export default function App() {
           {step === 4 && <Step4 data={data} update={update} />}
           {step === 5 && (
             <div>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <select
-                    value={provider}
-                    onChange={e => setProvider(e.target.value as AIProviderId)}
-                    className="form-input"
-                    style={{ width: 'auto', fontSize: '13px' }}
-                  >
-                    {AI_PROVIDERS.map(p => (
-                      <option key={p.id} value={p.id}>{p.label}</option>
-                    ))}
-                  </select>
-                  {aiMarkdown && <button className="btn-secondary" onClick={() => setAiMarkdown(null)}>Ver Original</button>}
-                  <button className="btn-secondary" onClick={copyToClipboard}>{copied ? 'Copiado!' : 'Copiar Raw'}</button>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  {aiMarkdown && <button className="btn-secondary" onClick={() => setAiMarkdown(null)}>Ver Original</button>}
-                  <button className="btn-secondary" onClick={copyToClipboard}>{copied ? 'Copiado!' : 'Copiar Raw'}</button>
-                  {/* Botão com a nova classe Premium unificada */}
-                  <button className="btn-ai-glow" onClick={handleAI} disabled={loading}>
-                    {loading ? (
-                      <>Processando...</>
-                    ) : (
-                      <>✨ Melhorar com IA</>
-                    )}
-                  </button>
-                </div>
+              <AIProviderSelector selected={provider} onChange={setProvider} />
+
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '16px', justifyContent: 'flex-end' }}>
+                {!isEditing && !aiPreview && (
+                  <button className="btn-secondary" onClick={startEdit} title="Editar README">✏️ Editar</button>
+                )}
+                {aiMarkdown && !isEditing && <button className="btn-secondary" onClick={() => { setAiMarkdown(null); setEditedMarkdown(null) }}>Ver Original</button>}
+                <button className="btn-secondary" onClick={copyToClipboard}>{copied ? 'Copiado!' : 'Copiar Raw'}</button>
+                <button className="btn-ai-glow" onClick={handleAI} disabled={loading}>
+                  {loading ? (
+                    <>Processando...</>
+                  ) : (
+                    <>✨ Melhorar com IA</>
+                  )}
+                </button>
               </div>
+
               {error && <div style={{ color: '#ff4d4d', marginBottom: '10px' }}>{error}</div>}
-              <div style={{ background: 'var(--surface-1)', border: '1px solid var(--border)', padding: '24px', borderRadius: '8px' }}>
-                <div dangerouslySetInnerHTML={{ __html: renderMd(displayMarkdown) }} />
-              </div>
+
+              {aiPreview ? (
+                <div>
+                  <div style={{ marginBottom: '16px', padding: '12px 16px', background: 'var(--accent-dim)', border: '1px solid var(--text-accent)', borderRadius: '8px', fontSize: '14px', color: 'var(--text-accent)' }}>
+                    Compare as duas versões abaixo e escolha qual manter.
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px' }}>ORIGINAL</div>
+                      <div style={{ background: 'var(--surface-1)', border: '1px solid var(--border)', padding: '20px', borderRadius: '8px', maxHeight: '600px', overflowY: 'auto' }}>
+                        <div dangerouslySetInnerHTML={{ __html: renderMd(baseMarkdown) }} />
+                      </div>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-accent)', marginBottom: '8px' }}>✨ MELHORADO PELA IA</div>
+                      <div style={{ background: 'var(--surface-1)', border: '1px solid var(--text-accent)', padding: '20px', borderRadius: '8px', maxHeight: '600px', overflowY: 'auto' }}>
+                        <div dangerouslySetInnerHTML={{ __html: renderMd(aiPreview) }} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                    <button className="btn-secondary" onClick={discardAI}>Manter original</button>
+                    <button className="btn-ai-glow" onClick={acceptAI}>✓ Usar versão da IA</button>
+                  </div>
+                </div>
+              ) : isEditing ? (
+                <div>
+                  <textarea
+                    value={draft}
+                    onChange={e => setDraft(e.target.value)}
+                    className="form-input"
+                    style={{
+                      width: '100%',
+                      minHeight: '500px',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '13px',
+                      lineHeight: 1.6,
+                      resize: 'vertical',
+                      marginBottom: '12px',
+                    }}
+                  />
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                    <button className="btn-secondary" onClick={cancelEdit}>Cancelar</button>
+                    <button className="btn-primary" onClick={saveEdit}>Salvar edição</button>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ background: 'var(--surface-1)', border: '1px solid var(--border)', padding: '24px', borderRadius: '8px' }}>
+                  <div dangerouslySetInnerHTML={{ __html: renderMd(displayMarkdown) }} />
+                </div>
+              )}
             </div>
           )}
         </div>

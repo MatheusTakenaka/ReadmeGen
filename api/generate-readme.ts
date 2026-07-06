@@ -1,3 +1,7 @@
+export const config = {
+  runtime: 'edge',
+};
+
 interface RequestBody {
   prompt: string;
   provider: 'anthropic' | 'openai' | 'gemini';
@@ -18,7 +22,9 @@ async function callAnthropic(prompt: string): Promise<string> {
     }),
   });
 
-  if (!response.ok) throw new Error(`Anthropic error: ${response.status}`);
+  if (!response.ok) {
+    throw new Error(`Anthropic error: ${response.status}`);
+  }
   const data = await response.json();
   return data.content?.[0]?.text ?? '';
 }
@@ -37,7 +43,9 @@ async function callOpenAI(prompt: string): Promise<string> {
     }),
   });
 
-  if (!response.ok) throw new Error(`OpenAI error: ${response.status}`);
+  if (!response.ok) {
+    throw new Error(`OpenAI error: ${response.status}`);
+  }
   const data = await response.json();
   return data.choices?.[0]?.message?.content ?? '';
 }
@@ -45,7 +53,7 @@ async function callOpenAI(prompt: string): Promise<string> {
 async function callGemini(prompt: string): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -55,7 +63,9 @@ async function callGemini(prompt: string): Promise<string> {
     }
   );
 
-  if (!response.ok) throw new Error(`Gemini error: ${response.status}`);
+  if (!response.ok) {
+    throw new Error(`Gemini error: ${response.status}`);
+  }
   const data = await response.json();
   return data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
 }
@@ -95,7 +105,7 @@ export default async function handler(req: Request) {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (err) {
-    console.error(err);
+    console.error('Erro ao gerar README:', err);
     return new Response(JSON.stringify({ error: 'Erro ao gerar README' }), { status: 500 });
   }
 }

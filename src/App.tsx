@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { FormData } from './types'
 import { generateMarkdown, renderMd } from './utils/markdown'
-import { callClaudeAPI } from './utils/api'
+import { generateReadme } from './utils/api'
+import { AI_PROVIDERS, type AIProviderId } from './types'
 import { Step1, Step2, Step3, Step4 } from './components/FormSteps'
 
 const STEPS = [
@@ -19,6 +20,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [provider, setProvider] = useState<AIProviderId>('anthropic')
 
   const [data, setData] = useState<FormData>({
     name: "", description: "", status: "active", demo: "",
@@ -56,11 +58,14 @@ export default function App() {
   const baseMarkdown = generateMarkdown(data)
   const displayMarkdown = aiMarkdown || baseMarkdown
 
+  const IMPROVE_INSTRUCTION = 'Você é um technical writer especializado em READMEs de projetos GitHub para desenvolvedores brasileiros. Melhore o README fornecido: reescreva a descrição para ser mais impactante e profissional, deixe as funcionalidades mais descritivas e com verbos de ação, melhore o texto geral mantendo o tom técnico. Mantenha TODA a estrutura existente (mesmas seções, mesmos emojis, mesmos blocos de código). Retorne APENAS o markdown melhorado, sem explicações e sem blocos de código extras envolvendo o conteúdo.'
+
   const handleAI = async () => {
     setLoading(true)
     setError(null)
     try {
-      const improved = await callClaudeAPI(baseMarkdown)
+      const prompt = `${IMPROVE_INSTRUCTION}\n\nMelhore este README:\n\n${baseMarkdown}`
+      const improved = await generateReadme(prompt, provider)
       setAiMarkdown(improved)
     } catch (e: any) {
       setError(e.message || "Erro ao conectar com a IA. Tente novamente.")
@@ -168,11 +173,19 @@ export default function App() {
           {step === 4 && <Step4 data={data} update={update} />}
           {step === 5 && (
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 600 }}>Preview Final</h3>
-                  {aiMarkdown && <span style={{ fontSize: '11px', color: 'var(--text-accent)' }}>✨ Melhorado com Claude AI</span>}
-                </div>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <select
+                    value={provider}
+                    onChange={e => setProvider(e.target.value as AIProviderId)}
+                    className="form-input"
+                    style={{ width: 'auto', fontSize: '13px' }}
+                  >
+                    {AI_PROVIDERS.map(p => (
+                      <option key={p.id} value={p.id}>{p.label}</option>
+                    ))}
+                  </select>
+                  {aiMarkdown && <button className="btn-secondary" onClick={() => setAiMarkdown(null)}>Ver Original</button>}
+                  <button className="btn-secondary" onClick={copyToClipboard}>{copied ? 'Copiado!' : 'Copiar Raw'}</button>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   {aiMarkdown && <button className="btn-secondary" onClick={() => setAiMarkdown(null)}>Ver Original</button>}
                   <button className="btn-secondary" onClick={copyToClipboard}>{copied ? 'Copiado!' : 'Copiar Raw'}</button>

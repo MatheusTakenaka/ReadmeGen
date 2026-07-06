@@ -1,32 +1,17 @@
-export async function callClaudeAPI(markdown: string): Promise<string> {
-  const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY
+import type { AIProviderId } from '../types'
 
-  if (!apiKey) {
-    throw new Error('Chave da API não encontrada. Crie um arquivo .env com VITE_ANTHROPIC_API_KEY.')
-  }
-
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+export async function generateReadme(prompt: string, provider: AIProviderId): Promise<string> {
+  const response = await fetch('/api/generate-readme', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1000,
-      system:
-        'Você é um technical writer especializado em READMEs de projetos GitHub para desenvolvedores brasileiros. Melhore o README fornecido: reescreva a descrição para ser mais impactante e profissional, deixe as funcionalidades mais descritivas e com verbos de ação, melhore o texto geral mantendo o tom técnico. Mantenha TODA a estrutura existente (mesmas seções, mesmos emojis, mesmos blocos de código). Retorne APENAS o markdown melhorado, sem explicações e sem blocos de código extras envolvendo o conteúdo.',
-      messages: [{ role: 'user', content: `Melhore este README:\n\n${markdown}` }],
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt, provider }),
   })
 
-  const data = await response.json()
-
-  if (data.error) {
-    throw new Error(data.error.message)
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}))
+    throw new Error(error.error ?? 'Falha ao gerar README')
   }
 
-  return data.content[0].text as string
+  const data = await response.json()
+  return data.readme
 }

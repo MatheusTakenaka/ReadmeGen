@@ -1,5 +1,18 @@
 # ReadmeGen
 
+<p align="center">
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" />
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
+  <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" />
+</p>
+
 Gerador de README profissional para projetos GitHub, com formulário guiado em etapas e melhoria opcional do texto via IA (Claude, GPT ou Gemini).
 
 ## ✨ Funcionalidades
@@ -78,4 +91,5 @@ vercel --prod
 
 Lembre-se de configurar as variáveis de ambiente (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`) no painel do projeto na Vercel (**Settings → Environment Variables**), já que o arquivo `.env` local não é enviado no deploy.
 
+---
  <p align="center">Desenvolvido por <a href="https://github.com/MatheusTakenaka">Matheus Takenaka</a></p>

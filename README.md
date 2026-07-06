@@ -78,3 +78,4 @@ vercel --prod
 
 Lembre-se de configurar as variáveis de ambiente (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`) no painel do projeto na Vercel (**Settings → Environment Variables**), já que o arquivo `.env` local não é enviado no deploy.
 
+ <p align="center">Desenvolvido por <a href="https://github.com/MatheusTakenaka">Matheus Takenaka</a></p>

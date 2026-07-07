@@ -52,14 +52,6 @@ npm install
 
 Esse projeto integra três provedores de IA opcionais para a função "Melhorar com IA". Você não precisa configurar todos — apenas os que pretende usar.
 
-Crie um arquivo `.env` na raiz do projeto com as chaves dos provedores desejados:
-
-ANTHROPIC_API_KEY=sk-ant-... 
-
-OPENAI_API_KEY=sk-...
-
-GEMINI_API_KEY=...
-
 ## ⚠️ Nunca commite o arquivo `.env`. Confirme que ele está listado no `.gitignore`.
 
 ### Rodando localmente

@@ -1,11 +1,16 @@
 import { FormData } from '../types'
 
 export function escHtml(t: string): string {
-  return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  return t
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
 }
 
 export function inlineMd(text: string): string {
-  return text
+  return escHtml(text)
     .replace(
       /!\[([^\]]*)\]\(([^)]+)\)/g,
       '<img src="$2" alt="$1" style="height:18px;vertical-align:middle;margin-right:4px">',

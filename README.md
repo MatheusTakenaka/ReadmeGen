@@ -52,6 +52,12 @@ npm install
 
 Esse projeto integra três provedores de IA opcionais para a função "Melhorar com IA". Você não precisa configurar todos — apenas os que pretende usar.
 
+Copie o arquivo de exemplo e preencha as chaves desejadas:
+
+```bash
+cp .env.example .env
+```
+
 ## ⚠️ Nunca commite o arquivo `.env`. Confirme que ele está listado no `.gitignore`.
 
 ### Rodando localmente
@@ -66,6 +72,12 @@ vercel dev
 ```
 
 Na primeira execução, a CLI vai pedir login e configuração do projeto (aceite os padrões sugeridos). A aplicação ficará disponível em `http://localhost:3000`.
+
+### Rodando os testes
+
+```bash
+npm test
+```
 
 ### Build para produção
 

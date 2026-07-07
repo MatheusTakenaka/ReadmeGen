@@ -8,7 +8,6 @@ export interface FormData {
   prereqs: string
   install: string
   run: string
-  screenshot: string
 }
 
 export interface StepMeta {

@@ -1,10 +1,10 @@
 import type { AIProviderId } from '../types'
 
-export async function generateReadme(prompt: string, provider: AIProviderId): Promise<string> {
+export async function generateReadme(markdown: string, provider: AIProviderId): Promise<string> {
   const response = await fetch('/api/generate-readme', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt, provider }),
+    body: JSON.stringify({ markdown, provider }),
   })
 
   if (!response.ok) {

@@ -243,3 +243,299 @@ body {
   color: var(--text-secondary);
   font-style: italic;
 }
+
+/* --- Layout geral (App) --- */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--background);
+}
+
+.topbar {
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topbar-logo-icon {
+  filter: drop-shadow(0 0 8px var(--accent-dim));
+}
+
+.topbar-logo-text {
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+.topbar-step-count {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.main-body {
+  display: flex;
+  flex: 1;
+}
+
+/* --- Sidebar de etapas --- */
+.sidebar {
+  width: 220px;
+  background: var(--surface-1);
+  border-right: 1px solid var(--border);
+  padding: 20px 0;
+}
+
+.sidebar-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  opacity: 0.5;
+}
+
+.sidebar-step.is-active,
+.sidebar-step.is-done {
+  opacity: 1;
+}
+
+.sidebar-step.is-active {
+  background: var(--accent-dim);
+}
+
+.sidebar-step.is-done {
+  cursor: pointer;
+}
+
+.sidebar-step-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #fff;
+  font-weight: 400;
+}
+
+.sidebar-step-badge.is-done {
+  background: #1f6feb;
+  color: #fff;
+  font-weight: 600;
+}
+
+.sidebar-step-badge.is-active {
+  background: var(--text-accent);
+  color: var(--background);
+  font-weight: 600;
+}
+
+.sidebar-step-label {
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 400;
+}
+
+.sidebar-step-label.is-active {
+  color: var(--text-accent);
+  font-weight: 500;
+}
+
+/* --- Área de conteúdo --- */
+.content-area {
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+}
+
+.content-title {
+  margin: 0 0 24px 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.step5-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+  justify-content: flex-end;
+}
+
+.error-message {
+  color: #ff4d4d;
+  margin-bottom: 10px;
+}
+
+.ai-compare-banner {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: var(--accent-dim);
+  border: 1px solid var(--text-accent);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text-accent);
+}
+
+.ai-compare-grid {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.ai-compare-col {
+  flex: 1;
+}
+
+.ai-compare-col-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.ai-compare-col-title.is-ai {
+  color: var(--text-accent);
+}
+
+.ai-compare-box {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: 8px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.ai-compare-box.is-ai {
+  border: 1px solid var(--text-accent);
+}
+
+.ai-compare-actions,
+.edit-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.edit-textarea {
+  width: 100%;
+  min-height: 500px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+  margin-bottom: 12px;
+}
+
+.readme-preview {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  padding: 24px;
+  border-radius: 8px;
+}
+
+.footer-nav {
+  background: var(--surface-1);
+  border-top: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* --- Steps do formulário --- */
+.step-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.status-options {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.status-option {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border);
+  background: var(--surface-0);
+  color: var(--text-primary);
+}
+
+.status-option.is-selected {
+  font-weight: 600;
+}
+
+.feature-input-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.feature-empty {
+  padding: 32px;
+  text-align: center;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+}
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.feature-item-text {
+  font-size: 13px;
+}
+
+.feature-remove-btn {
+  background: transparent;
+  border: none;
+  color: #ff4d4d;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.step4-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mono-input {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}

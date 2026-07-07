@@ -8,7 +8,7 @@ interface RequestBody {
 }
 
 async function callAnthropic(prompt: string): Promise<string> {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+  const response = await fetchWithRetry('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -16,7 +16,7 @@ async function callAnthropic(prompt: string): Promise<string> {
       'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-sonnet-5',
       max_tokens: 2000,
       messages: [{ role: 'user', content: prompt }],
     }),
@@ -30,7 +30,7 @@ async function callAnthropic(prompt: string): Promise<string> {
 }
 
 async function callOpenAI(prompt: string): Promise<string> {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const response = await fetchWithRetry('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -52,7 +52,7 @@ async function callOpenAI(prompt: string): Promise<string> {
 
 async function callGemini(prompt: string): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
-  const response = await fetch(
+  const response = await fetchWithRetry(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`,
     {
       method: 'POST',
@@ -108,4 +108,15 @@ export default async function handler(req: Request) {
     console.error('Erro ao gerar README:', err);
     return new Response(JSON.stringify({ error: 'Erro ao gerar README' }), { status: 500 });
   }
+}
+
+async function fetchWithRetry(url: string, options: RequestInit, retries = 2): Promise<Response> {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const response = await fetch(url, options)
+    if (response.status !== 503 || attempt === retries) {
+      return response
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)))
+  }
+  throw new Error('Falha após múltiplas tentativas')
 }
